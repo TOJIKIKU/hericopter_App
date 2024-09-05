@@ -44,7 +44,7 @@
 
         // 航空写真タイルを追加
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+            attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
             maxZoom: 18
         }).addTo(map);
 
@@ -79,14 +79,72 @@
             return closestPoint;
         }
 
-        // リアルタイムで半径5km以内の緑エリアを赤に塗り替え
+        // リアルタイムで半径5km以内の緑エリアを青に塗り替え
         function checkAndColorGreenAreas() {
             greenAreas.forEach(function(area) {
                 if (map.distance(helicopterLatLng, area.getBounds().getCenter()) <= 5000) {
-                    area.setStyle({ color: 'red', fillColor: 'red' });
+                    area.setStyle({ color: 'blue', fillColor: 'blue' });
                 }
             });
         }
+
+        // ヘリの位置更新
+        function updateHelicopterPosition() {
+            helicopterLatLng[0] += latChangePerSecond;
+            marker.setLatLng(helicopterLatLng);
+            circle.setLatLng(helicopterLatLng);
+            map.setView(helicopterLatLng);
+
+            checkAndColorGreenAreas();
+
+            var closestPoint = getClosestPoint(helicopterLatLng, greenAreas[0].getLatLngs()[0]);
+            var distance = map.distance(helicopterLatLng, closestPoint);
+            document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(distance)} メートル`;
+        }
+
+        // 1秒ごとにヘリ位置を更新
+        var moveInterval = setInterval(updateHelicopterPosition, 1000);
+
+        // 弧を描く関数
+        function drawArc() {
+            var closestBlueArea = null;
+            var minDistance = Infinity;
+
+            greenAreas.forEach(function(area) {
+                var closestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
+                var distance = map.distance(helicopterLatLng, closestPoint);
+                
+                // 青く塗りつぶされたエリアに対して最も近い点を見つける
+                if (area.options.fillColor === 'blue' && distance < minDistance) {
+                    closestBlueArea = closestPoint;
+                    minDistance = distance;
+                }
+            });
+
+            // 最も近い青エリアが見つかった場合に弧を描く
+            if (closestBlueArea) {
+                var arcPoints = [
+                    helicopterLatLng,  // ヘリの現在地
+                    closestBlueArea    // 青いエリアの最も近い点
+                ];
+
+                var arcLine = L.polyline(arcPoints, { color: 'blue', weight: 2, dashArray: '5, 10' }).addTo(map);
+            }
+        }
+
+        // 緊急停止ボタンの動作
+        document.getElementById('emergencyBtn').addEventListener('click', function() {
+            clearInterval(moveInterval); // ヘリの移動を停止
+            drawArc(); // 緊急時にヘリと最も近い青いエリアを結ぶ弧を描く
+        });
+
+        // 再始動ボタンの動作
+        document.getElementById('resumeBtn').addEventListener('click', function() {
+            moveInterval = setInterval(updateHelicopterPosition, 1000); // ヘリの移動を再開
+        });
+    </script>
+</body>
+</html>
 
         // ヘリの位置更新
         function updateHelicopterPosition() {
