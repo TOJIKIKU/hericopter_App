@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヘリコプター位置情報アプリ</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="button-container">
+        <button onclick="emergency()">緊急</button>
+        <button onclick="restart()">再起動</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([35.681236, 139.767125], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        var latlngs = [
+            [35.681236, 139.767125],
+            [36.752778, 139.598611]
+        ];
+        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+
+        var blueCircles = [];
+        for (var i = 0; i < 100; i++) {
+            var lat = 35.681236 + (Math.random() * 1.071542 - 0.535771);
+            var lng = 139.767125 + (Math.random() * 0.831486 - 0.415743);
+            var circle = L.circle([lat, lng], {
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.5,
+                radius: 500
+            }).addTo(map);
+            blueCircles.push(circle);
+        }
+
+        var helicopterMarker = L.marker([35.681236, 139.767125]).addTo(map);
+        var currentIndex = 0;
+        var speed = 180 / 3600; // 時速180kmを秒単位に変換
+        var interval;
+        var moving = true;
+
+        function moveHelicopter() {
+            if (currentIndex < latlngs.length - 1) {
+                var start = L.latLng(latlngs[currentIndex]);
+                var end = L.latLng(latlngs[currentIndex + 1]);
+                var distance = start.distanceTo(end);
+                var duration = distance / speed;
+                helicopterMarker.setLatLng(end);
+                currentIndex++;
+                interval = setTimeout(moveHelicopter, duration * 1000);
+            }
+        }
+
+        function emergency() {
+            clearTimeout(interval);
+            moving = false;
+            var helicopterPos = helicopterMarker.getLatLng();
+            var nearestCircle = null;
+            var minDistance = Infinity;
+
+            blueCircles.forEach(function(circle) {
+                var circlePos = circle.getLatLng();
+                var distance = helicopterPos.distanceTo(circlePos);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestCircle = circle;
+                }
+            });
+
+            if (nearestCircle) {
+                var arc = L.polyline([helicopterPos, nearestCircle.getLatLng()], {color: 'green'}).addTo(map);
+                alert("直線距離: " + (minDistance / 1000).toFixed(2) + " km");
+            }
+        }
+
+        function restart() {
+            if (!moving) {
+                currentIndex = 0;
+                helicopterMarker.setLatLng(latlngs[0]);
+                moving = true;
+                moveHelicopter();
+            }
+        }
+
+        moveHelicopter();
+    </script>
+</body>
+</html>
