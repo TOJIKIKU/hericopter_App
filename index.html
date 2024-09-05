@@ -65,7 +65,7 @@
 
         var latChangePerSecond = 50 / 111000; // 50メートルごとの緯度増加
 
-        // ヘリと最も近い緑のエリアの距離計算
+        // ヘリと最も近いエリアの距離計算
         function getClosestPoint(point, polygonPoints) {
             var minDist = Infinity;
             var closestPoint = null;
@@ -81,11 +81,26 @@
 
         // リアルタイムで半径5km以内の緑エリアを青に塗り替え
         function checkAndColorGreenAreas() {
+            var closestDistance = Infinity;
+            var closestPoint = null;
+
             greenAreas.forEach(function(area) {
                 if (map.distance(helicopterLatLng, area.getBounds().getCenter()) <= 5000) {
                     area.setStyle({ color: 'blue', fillColor: 'blue' });
+
+                    var areaClosestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
+                    var distance = map.distance(helicopterLatLng, areaClosestPoint);
+
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestPoint = areaClosestPoint;
+                    }
                 }
             });
+
+            if (closestPoint) {
+                document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(closestDistance)} メートル`;
+            }
         }
 
         // ヘリの位置更新
@@ -96,10 +111,6 @@
             map.setView(helicopterLatLng);
 
             checkAndColorGreenAreas();
-
-            var closestPoint = getClosestPoint(helicopterLatLng, greenAreas[0].getLatLngs()[0]);
-            var distance = map.distance(helicopterLatLng, closestPoint);
-            document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(distance)} メートル`;
         }
 
         // 1秒ごとにヘリ位置を更新
@@ -145,4 +156,5 @@
     </script>
 </body>
 </html>
+
 
