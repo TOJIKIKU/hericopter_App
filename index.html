@@ -30,12 +30,10 @@
     <div id="controls">
         <button id="emergencyBtn">緊急</button>
         <button id="resumeBtn">再始動</button>
-        <button onclick="location.href='index_2.html'">航路</button>
         <div id="distanceDisplay">距離: 計算中...</div>
     </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-curve/dist/leaflet-curve.js"></script>
     <script>
         var map = L.map('map', {
             center: [35.681236, 139.767125],
@@ -55,7 +53,7 @@
 
         // 青色エリアの配置
         var greenAreas = [];
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < 100; i++) {
             var angle = Math.random() * 2 * Math.PI;  // 円周上のランダムな角度
             var radius = 0.03 + Math.random() * 0.02;  // 半径
             var latOffset = radius * Math.cos(angle);
@@ -64,9 +62,9 @@
             var latLng = [helicopterLatLng[0] + latOffset, helicopterLatLng[1] + lngOffset];
             var polygon = L.polygon([
                 [latLng[0], latLng[1]],
-                [latLng[0] + 0.002, latLng[1]],
-                [latLng[0] + 0.002, latLng[1] + 0.002],
-                [latLng[0], latLng[1] + 0.002]
+                [latLng[0] + 0.001, latLng[1]],
+                [latLng[0] + 0.001, latLng[1] + 0.001],
+                [latLng[0], latLng[1] + 0.001]
             ], { color: 'green', fillColor: 'green', fillOpacity: 0.5 });
             greenAreas.push(polygon);
         }
@@ -144,11 +142,7 @@
             });
 
             if (closestBlueArea) {
-                var arcLine = L.curve([
-                    'M', helicopterLatLng,
-                    'Q', [helicopterLatLng[0] + (closestBlueArea[0] - helicopterLatLng[0]) / 2, helicopterLatLng[1] + (closestBlueArea[1] - helicopterLatLng[1]) / 2],
-                    'L', closestBlueArea
-                ], { color: 'blue', weight: 2 }).addTo(map);
+                var arcLine = L.polyline([helicopterLatLng, closestBlueArea], { color: 'blue', weight: 2, dashArray: '5, 10' }).addTo(map);
 
                 document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(map.distance(helicopterLatLng, closestBlueArea))} メートル`;
             }
@@ -165,6 +159,7 @@
     </script>
 </body>
 </html>
+
 
 </html>
 
