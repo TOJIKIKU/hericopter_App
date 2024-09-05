@@ -44,7 +44,7 @@
 
         // 航空写真タイルを追加
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
             maxZoom: 18
         }).addTo(map);
 
@@ -52,44 +52,27 @@
         var marker = L.marker(helicopterLatLng).addTo(map);
         var circle = L.circle(helicopterLatLng, { radius: 5000, color: 'red' }).addTo(map);
 
-        // 緑の場所の候補（10秒ごとに異なる場所を設定）
-        var greenAreasSets = [
-            [
-                L.polygon([[35.684073, 139.752800], [35.686400, 139.752400], [35.687973, 139.757000], [35.684600, 139.758000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.676500, 139.770000], [35.678500, 139.775000], [35.675000, 139.772000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.690000, 139.770000], [35.693000, 139.772000], [35.691000, 139.776000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
-            ],
-            [
-                L.polygon([[35.685000, 139.760000], [35.687000, 139.765000], [35.684000, 139.762000]], { color: 'green',
-                L.polygon([[35.685000, 139.760000], [35.687000, 139.765000], [35.684000, 139.762000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.680000, 139.780000], [35.682000, 139.785000], [35.679000, 139.782000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.695000, 139.780000], [35.698000, 139.782000], [35.696000, 139.786000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
-            ],
-            [
-                L.polygon([[35.686000, 139.770000], [35.688000, 139.775000], [35.685000, 139.772000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.681000, 139.790000], [35.683000, 139.795000], [35.680000, 139.792000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.696000, 139.790000], [35.699000, 139.792000], [35.697000, 139.796000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
-            ],
-            [
-                L.polygon([[35.687000, 139.780000], [35.689000, 139.785000], [35.686000, 139.782000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.682000, 139.800000], [35.684000, 139.805000], [35.681000, 139.802000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.697000, 139.800000], [35.700000, 139.802000], [35.698000, 139.806000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
-            ],
-            [
-                L.polygon([[35.688000, 139.790000], [35.690000, 139.795000], [35.687000, 139.792000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.683000, 139.810000], [35.685000, 139.815000], [35.682000, 139.812000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
-                L.polygon([[35.698000, 139.810000], [35.701000, 139.812000], [35.699000, 139.816000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
-            ]
+        // 緑の場所の候補（仮にいくつか設定）
+        var greenAreas = [
+            L.polygon([[35.684073, 139.752800], [35.686400, 139.752400], [35.687973, 139.757000], [35.684600, 139.758000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
+            L.polygon([[35.676500, 139.770000], [35.678500, 139.775000], [35.675000, 139.772000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
+            L.polygon([[35.690000, 139.770000], [35.693000, 139.772000], [35.691000, 139.776000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
         ];
 
-        var currentGreenAreas = greenAreasSets[0];
-        currentGreenAreas.forEach(function(area) {
+        // 仮の場所を10秒ごとに設定
+        var additionalGreenAreas = [
+            L.polygon([[35.679000, 139.760000], [35.680000, 139.761000], [35.678000, 139.762000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 }),
+            L.polygon([[35.688000, 139.775000], [35.689000, 139.776000], [35.687000, 139.777000]], { color: 'green', fillColor: 'green', fillOpacity: 0.5 })
+        ];
+
+        // 追加の緑のエリアを地図に追加
+        additionalGreenAreas.forEach(function(area) {
             area.addTo(map);
         });
 
         var latChangePerSecond = 50 / 111000; // 50メートルごとの緯度増加
 
-        // ヘリと最も近いエリアの距離計算
+        // ヘリと最も近い緑のエリアの距離計算
         function getClosestPoint(point, polygonPoints) {
             var minDist = Infinity;
             var closestPoint = null;
@@ -103,28 +86,22 @@
             return closestPoint;
         }
 
-        // リアルタイムで半径5km以内の緑エリアを青に塗り替え
+        // リアルタイムで半径5km以内の緑エリアを赤に塗り替え
         function checkAndColorGreenAreas() {
-            var closestDistance = Infinity;
-            var closestPoint = null;
-
-            currentGreenAreas.forEach(function(area) {
+            greenAreas.forEach(function(area) {
                 if (map.distance(helicopterLatLng, area.getBounds().getCenter()) <= 5000) {
-                    area.setStyle({ color: 'blue', fillColor: 'blue' });
-
-                    var areaClosestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
-                    var distance = map.distance(helicopterLatLng, areaClosestPoint);
-
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestPoint = areaClosestPoint;
-                    }
+                    area.setStyle({ color: 'red', fillColor: 'red' });
                 }
             });
+        }
 
-            if (closestPoint) {
-                document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(closestDistance)} メートル`;
-            }
+        // 緑のエリアを青に塗り替える関数
+        function colorGreenAreasBlue() {
+            additionalGreenAreas.forEach(function(area) {
+                if (area.options.fillColor === 'green') {
+                    area.setStyle({ color: 'blue', fillColor: 'blue' });
+                }
+            });
         }
 
         // ヘリの位置更新
@@ -135,71 +112,44 @@
             map.setView(helicopterLatLng);
 
             checkAndColorGreenAreas();
+
+            var closestPoint = getClosestPoint(helicopterLatLng, greenAreas[0].getLatLngs()[0]);
+            var distance = map.distance(helicopterLatLng, closestPoint);
+            document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(distance)} メートル`;
         }
 
         // 1秒ごとにヘリ位置を更新
         var moveInterval = setInterval(updateHelicopterPosition, 1000);
 
-        // 10秒ごとに緑エリアを更新
-        var greenAreaIndex = 0;
-        function updateGreenAreas() {
-            currentGreenAreas.forEach(function(area) {
-                map.removeLayer(area);
-            });
+        // 10秒ごとに追加の緑のエリアを青に塗り替える
+        var colorChangeInterval = setInterval(colorGreenAreasBlue, 10000);
 
-            greenAreaIndex = (greenAreaIndex + 1) % greenAreasSets.length;
-            currentGreenAreas = greenAreasSets[greenAreaIndex];
-            currentGreenAreas.forEach(function(area) {
-                area.addTo(map);
-            });
-
-            checkAndColorGreenAreas();
-        }
-
-        var greenAreaInterval = setInterval(updateGreenAreas, 10000);
+        // 50秒後に青に塗り替える作業を停止
+        setTimeout(function() {
+            clearInterval(colorChangeInterval);
+        }, 50000);
 
         // 弧を描く関数
         function drawArc() {
-            var closestBlueArea = null;
+            var closestRedArea = null;
             var minDistance = Infinity;
 
-            currentGreenAreas.forEach(function(area) {
+            greenAreas.forEach(function(area) {
                 var closestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
                 var distance = map.distance(helicopterLatLng, closestPoint);
                 
-                // 青く塗りつぶされたエリアに対して最も近い点を見つけ
-            greenAreaIndex = (greenAreaIndex + 1) % greenAreasSets.length;
-            currentGreenAreas = greenAreasSets[greenAreaIndex];
-            currentGreenAreas.forEach(function(area) {
-                area.addTo(map);
-            });
-
-            checkAndColorGreenAreas();
-        }
-
-        var greenAreaInterval = setInterval(updateGreenAreas, 10000);
-
-        // 弧を描く関数
-        function drawArc() {
-            var closestBlueArea = null;
-            var minDistance = Infinity;
-
-            currentGreenAreas.forEach(function(area) {
-                var closestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
-                var distance = map.distance(helicopterLatLng, closestPoint);
-                
-                // 青く塗りつぶされたエリアに対して最も近い点を見つける
-                if (area.options.fillColor === 'blue' && distance < minDistance) {
-                    closestBlueArea = closestPoint;
+                // 赤く塗りつぶされたエリアに対して最も近い点を見つける
+                if (area.options.fillColor === 'red' && distance < minDistance) {
+                    closestRedArea = closestPoint;
                     minDistance = distance;
                 }
             });
 
-            // 最も近い青エリアが見つかった場合に弧を描く
-            if (closestBlueArea) {
+            // 最も近い赤エリアが見つかった場合に弧を描く
+            if (closestRedArea) {
                 var arcPoints = [
                     helicopterLatLng,  // ヘリの現在地
-                    closestBlueArea    // 青いエリアの最も近い点
+                    closestRedArea     // 赤いエリアの最も近い点
                 ];
 
                 var arcLine = L.polyline(arcPoints, { color: 'blue', weight: 2, dashArray: '5, 10' }).addTo(map);
@@ -209,15 +159,18 @@
         // 緊急停止ボタンの動作
         document.getElementById('emergencyBtn').addEventListener('click', function() {
             clearInterval(moveInterval); // ヘリの移動を停止
-            drawArc(); // 緊急時にヘリと最も近い青いエリアを結ぶ弧を描く
+            clearInterval(colorChangeInterval); // 緑のエリアを青に塗り替える作業を停止
+            drawArc(); // 緊急時にヘリと最も近い赤いエリアを結ぶ弧を描く
         });
 
         // 再始動ボタンの動作
         document.getElementById('resumeBtn').addEventListener('click', function() {
             moveInterval = setInterval(updateHelicopterPosition, 1000); // ヘリの移動を再開
+            colorChangeInterval = setInterval(colorGreenAreasBlue, 10000); // 青に塗り替える作業を再開
         });
     </script>
 </body>
 </html>
+
 
 
