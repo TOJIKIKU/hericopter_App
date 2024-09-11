@@ -24,42 +24,9 @@ body {
 .message {
     margin: 10px 0;
     padding: 10px;
+    background-color: #d1e7fd;
     border-radius: 10px;
     max-width: 80%;
-}
-
-.controller {
-    background-color: #e6e6e6;
     text-align: left;
-    margin-left: 0;
-}
-
-.pilot {
-    background-color: #d1e7fd;
-    text-align: right;
-    margin-left: auto;
-}
-
-.label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.highlight {
-    background-color: yellow;
-}
-
-button {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
 }
 
