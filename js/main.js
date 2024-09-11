@@ -1,54 +1,32 @@
-let transcription = [
-    { time: 2, role: 'controller', text: "NRT cleared to FL180, turn right heading 270." },
-    { time: 5, role: 'pilot', text: "Cleared to FL180, turning right heading 270, Japan Airlines 123." }
-];
-
+// サンプルの音声ファイルをサーバーに送信し、文字起こし結果を取得
 function startTranscription() {
-    playAudio();
-    simulateTranscription();
+    let audioFile = new File([''], 'sample-pilot-controller.wav', {
+        type: 'audio/wav'
+    });
+
+    let formData = new FormData();
+    formData.append('file', audioFile);
+
+    // Flaskサーバーに音声ファイルを送信
+    fetch('http://127.0.0.1:5000/transcribe', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        displayTranscription(data.transcription);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
-function playAudio() {
-    var audio = new Audio('audio/sample-pilot-controller.wav');
-    audio.play();
-}
-
-function simulateTranscription() {
+// 文字起こし結果をチャットウィンドウに表示
+function displayTranscription(text) {
     let chatWindow = document.getElementById('chat-window');
-    let currentIndex = 0;
-
-    function displayMessage() {
-        if (currentIndex < transcription.length) {
-            let message = transcription[currentIndex];
-            let messageElement = document.createElement('div');
-            messageElement.classList.add('message', message.role);
-
-            let labelElement = document.createElement('span');
-            labelElement.classList.add('label');
-            labelElement.textContent = message.role.charAt(0).toUpperCase() + message.role.slice(1);
-
-            let textElement = document.createElement('p');
-            textElement.innerHTML = highlightTechnicalTerms(message.text);
-
-            messageElement.appendChild(labelElement);
-            messageElement.appendChild(textElement);
-            chatWindow.appendChild(messageElement);
-
-            currentIndex++;
-        }
-    }
-
-    transcription.forEach((msg, index) => {
-        setTimeout(displayMessage, msg.time * 1000);
-    });
+    let messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.textContent = text;
+    chatWindow.appendChild(messageElement);
 }
 
-function highlightTechnicalTerms(text) {
-    // Simple example of highlighting technical terms
-    const terms = ["NRT", "FL180", "Japan Airlines 123"];
-    terms.forEach(term => {
-        const regex = new RegExp(`(${term})`, 'gi');
-        text = text.replace(regex, `<mark class="highlight">$1</mark>`);
-    });
-    return text;
-}
