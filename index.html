@@ -15,6 +15,40 @@
     </div>
 
     <script src="js/main.js"></script>
+    <style>
+        #map { height: 500px; }
+        #controls {
+            margin-top: 20px;
+        }
+        button {
+            background-color: red; 
+            color: white; 
+            padding: 10px;
+            border: none;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button_1 {
+            background-color: blue; 
+            color: white; 
+            padding: 10px;
+            border: none;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        #distanceDisplay {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div id="controls">
+        <button onclick="location.href='index_map.html'">航路</button>
+        <button_1 onclick="location.href='index_home.html'">現在地</button_1>
+    </div>
 </body>
 </html>
 
