@@ -82,21 +82,6 @@
             area.addTo(map);
         });
 
-        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
-
-        var blueCircles = [];
-        for (var i = 0; i < 50; i++) {
-            var lat = latlngs[0][0] + (Math.random() * (latlngs[1][0] - latlngs[0][0]));
-            var lng = latlngs[0][1] + (Math.random() * (latlngs[1][1] - latlngs[0][1]));
-            var circle = L.circle([lat, lng], {
-                color: 'blue',
-                fillColor: '#30f',
-                fillOpacity: 0.5,
-                radius: 500
-            }).addTo(map);
-            blueCircles.push(circle);
-        }
-
         var latChangePerSecond = 50 / 111000; // 50メートルごとの緯度増加
 
         function getClosestPoint(point, polygonPoints) {
