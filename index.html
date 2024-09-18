@@ -82,21 +82,6 @@
             area.addTo(map);
         });
 
-        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
-
-        var blueCircles = [];
-        for (var i = 0; i < 50; i++) {
-            var lat = latlngs[0][0] + (Math.random() * (latlngs[1][0] - latlngs[0][0]));
-            var lng = latlngs[0][1] + (Math.random() * (latlngs[1][1] - latlngs[0][1]));
-            var circle = L.circle([lat, lng], {
-                color: 'blue',
-                fillColor: '#30f',
-                fillOpacity: 0.5,
-                radius: 500
-            }).addTo(map);
-            blueCircles.push(circle);
-        }
-
         var latChangePerSecond = 50 / 111000; // 50メートルごとの緯度増加
 
         function getClosestPoint(point, polygonPoints) {
@@ -121,7 +106,7 @@
                 var distanceToCenter = map.distance(helicopterLatLng, areaCenter);
                 
                 if (distanceToCenter <= 5000) {
-                    area.setStyle({ color: 'blue', fillColor: 'blue' });
+                    area.setStyle({ color: 'green', fillColor: 'green' });
 
                     var areaClosestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
                     var distance = map.distance(helicopterLatLng, areaClosestPoint);
@@ -131,7 +116,7 @@
                         closestPoint = areaClosestPoint;
                     }
                 } else {
-                    area.setStyle({ color: 'green', fillColor: 'green' });
+                    area.setStyle({ color: 'blue', fillColor: 'blue' });
                 }
             });
 
@@ -152,23 +137,23 @@
         var moveInterval = setInterval(updateHelicopterPosition, 1000);
 
         function drawArc() {
-            var closestBlueArea = null;
+            var closestGreenArea = null;
             var minDistance = Infinity;
 
             greenAreas.forEach(function(area) {
                 var closestPoint = getClosestPoint(helicopterLatLng, area.getLatLngs()[0]);
                 var distance = map.distance(helicopterLatLng, closestPoint);
                 
-                if (area.options.fillColor === 'blue' && distance < minDistance) {
-                    closestBlueArea = closestPoint;
+                if (area.options.fillColor === 'green' && distance < minDistance) {
+                    closestGreenArea = closestPoint;
                     minDistance = distance;
                 }
             });
 
-            if (closestBlueArea) {
-                var arcLine = L.polyline([helicopterLatLng, closestBlueArea], { color: 'blue', weight: 2, dashArray: '5, 10' }).addTo(map);
+            if (closestGreenArea) {
+                var arcLine = L.polyline([helicopterLatLng, closestGreenArea], { color: 'blue', weight: 2, dashArray: '5, 10' }).addTo(map);
 
-                document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(map.distance(helicopterLatLng, closestBlueArea))} メートル`;
+                document.getElementById('distanceDisplay').innerText = `距離: ${Math.round(map.distance(helicopterLatLng, closestGreenArea))} メートル`;
             }
         }
 
