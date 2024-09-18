@@ -59,14 +59,14 @@
         var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
 
         var blueCircles = [];
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < 100; i++) {  // 数を100に増やす
             var lat = latlngs[0][0] + (Math.random() * (latlngs[1][0] - latlngs[0][0]));
             var lng = latlngs[0][1] + (Math.random() * (latlngs[1][1] - latlngs[0][1]));
             var circle = L.circle([lat, lng], {
                 color: 'blue',
                 fillColor: '#30f',
                 fillOpacity: 0.5,
-                radius: 500
+                radius: 250  // 半径を250に変更
             }).addTo(map);
             blueCircles.push(circle);
         }
@@ -168,3 +168,4 @@
     </script>
 </body>
 </html>
+
