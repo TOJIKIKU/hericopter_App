@@ -46,7 +46,7 @@
     <script>
         var map = L.map('map', {
             center: [35.681236, 139.767125],
-            zoom: 13,
+            zoom: 10,
             zoomControl: true,
             scrollWheelZoom: true
         });
@@ -59,6 +59,13 @@
         var helicopterLatLng = [35.681236, 139.767125];
         var marker = L.marker(helicopterLatLng).addTo(map);
         var circle = L.circle(helicopterLatLng, { radius: 5000, color: 'red' }).addTo(map);
+
+        // 東京駅から日光への赤い線を追加
+        var tokyoToNikko = [
+            [35.681236, 139.767125],  // 東京駅
+            [36.756611, 139.598722]   // 日光
+        ];
+        var redLine = L.polyline(tokyoToNikko, {color: 'red'}).addTo(map);
 
         // 青色エリアの配置
         var greenAreas = [];
@@ -168,6 +175,7 @@
     </script>
 </body>
 </html>
+
 
 
 
